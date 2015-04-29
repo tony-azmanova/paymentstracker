@@ -1,20 +1,19 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-	/** 
-	* Invoices Class 
-	* 
-	* @package Package Name 
-	* @subpackage Subpackage 
-	* @category Category 
-	* @author Tony Azmanova 
-	* @link http://localhost/payments/invoices/index
-	*/ 
+/** 
+* Invoices Class 
+* 
+* @package PaymentsTracker
+* @subpackage Invoices 
+* @category Invoices
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Invoices extends MY_Controller {
+	
 	/**
-	 * __construct function -function that loads the
-	 * Invoices_model, Items_model and Incomes_model for the Invoices controller 
+	 * __construct function - loads the Invoices_model, Items_model and Incomes_model
 	 * @param array $user_stat check if the user is with activ status
 	 * @return sring if the user is with status inactiv 
-	 * 
 	 */
 	public function __construct(){
 		
@@ -29,12 +28,12 @@ class Invoices extends MY_Controller {
     /**
 	 * index function - the index function for the Invoices controller 
 	 * @param integer $page number of page to begin 
+	 * @return void
 	 */
-    
 	public function index($page=1){
 		
 		$user_profile = $this->Users_model->userProfile();
-		$invoice_result = $this->Invoices_model->countInvoiseList();
+		$invoice_result = $this->Invoices_model->countInvoicesList();
 		$this->load->library("pagination");
 		$config = array();
 		$config["base_url"] =base_url('invoices/page/');
@@ -43,10 +42,9 @@ class Invoices extends MY_Controller {
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
 		$this->pagination->initialize($config);
-
+		
 		$start =  date('Y-m-01');
 		$end = date('Y-m-t'); 
-		
 		$data['start_date_more_previos'] = date('Y-m-d', strtotime("first day of -2 month"));
 		$data['end_date_more_previos'] = date('Y-m-d', strtotime("last day of -2 month"));
 		$data['start_date_privios'] = date('Y-m-d', strtotime("first day of -1 month"));
@@ -57,14 +55,12 @@ class Invoices extends MY_Controller {
 		$data['incomes'] = $this->Incomes_model->getAllIncomes($start,$end);
 		$data['links']= $this->pagination->create_links();
 		$data['invoce_list'] = $this->Invoices_model->getAllInvoicesList($page,$config['per_page']);
-		
 		$this->loadView('invoices/list',$data);
-
 	} 
 
 	/**
 	 * newInvoice function - add new invoice
-	 *
+	 * @return void
 	 */
 	public function newInvoice(){
 
@@ -112,8 +108,8 @@ class Invoices extends MY_Controller {
 		
 	}
 	
-	 /**
-	 * index function - the index function for the Invoices controller 
+	/**
+	 * getCharts function - the index function for the Invoices controller 
 	 * @param string $start start date for the chart
 	 * @param string $end end date for the chart
 	 * @return string 
@@ -128,13 +124,13 @@ class Invoices extends MY_Controller {
 		$income_total = $incomes['income_total'];
 		
 		echo "From ".date('d.m.Y', strtotime($start)). " to ".date('d.m.Y', strtotime($end))."
-		 the incomes are ".$income_total." and expenses are ".$invoices_total;
+		the incomes are ".$income_total." and expenses are ".$invoices_total;
 		
 	}
 	
 	/**
 	 * invoiceInfo function - get the information about the selected invoice
-	 * 
+	 * @return void
 	 */
 	public function invoiceInfo(){
 		$invoice_id =  $this->uri->segment(3);
@@ -152,7 +148,7 @@ class Invoices extends MY_Controller {
 	}
 	
 	
-     /**
+    /**
 	 * deleteInvoice function - delete the alredy existing invoice 
 	 * @return string if it is not user with level admin 
 	 */
@@ -232,7 +228,7 @@ class Invoices extends MY_Controller {
 	 * that are used in newIncome and editIncome functions
 	 * @return array
 	 */
-	public function setRulesForInvoice (){
+	public function setRulesForInvoice(){
 		
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
@@ -244,7 +240,8 @@ class Invoices extends MY_Controller {
 		$this->form_validation->set_rules('shop', 'Shop', 'required|numeric|xss_clean');
 		
 		
-		$field_properties = array(	array(
+		$field_properties = array(	
+									array(
 											'property'=>'type_id',
 											'human_name'=>'Item type',
 											'rules'=>'required|numeric'

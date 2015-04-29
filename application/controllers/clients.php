@@ -1,24 +1,21 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /** 
- * Clients Class 
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/clients/index
-*/
- 
+* Clients Class 
+* 
+* @package PaymentsTracker
+* @subpackage Clients 
+* @category Clients
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Clients extends MY_Controller {
 	
 	/**
-	 * __construct function -function that loads the
-	 * Clients_model for the Clients controller 
+	 * __construct function - loads the Clients_model 
 	 * @param array $user_stat check if the user is with activ status
 	 * @return sring if the user is with status inactiv 
-	 * 
-	*/
-	
+	 */
 	public function __construct(){
         parent::__construct();
         $this->load->model('Clients_model');
@@ -34,8 +31,8 @@ class Clients extends MY_Controller {
     /**
 	 * index function - the index function for the Clients controller 
 	 * @param integer $page number of page to begin 
-	*/
-		
+	 * @return void
+	 */
     public function index($page=1){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('invoices/index');
@@ -49,27 +46,24 @@ class Clients extends MY_Controller {
 		$config["per_page"] = 1;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
-		
 		$this->pagination->initialize($config);
-
-		$data['links']= $this->pagination->create_links();
 		
+		$data['links']= $this->pagination->create_links();
 		$clients = $this->Clients_model->getClients($page,$config['per_page']);
 		$data['clients'] = $clients;
 		$this->loadView('clients/list',$data);
-
 	}
 	
 	/**
 	 * newClients function - add a new client or company 
-	*/
+	 * @return void
+	 */
 	public function newClients(){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('clients/index');
 			die;
 		}
-		$clients = $this->Clients_model->getClients();
-		$data['clients'] = $clients;
+		$data['clients'] = $this->Clients_model->getClients();
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 		if($this->input->server('REQUEST_METHOD') =='POST'){
@@ -83,14 +77,13 @@ class Clients extends MY_Controller {
 				}
 			}
 		} 
-		
 		$this->loadView('clients/new',$data);
 	}
 	  
 	/**
-	 * clientInfo function - get the information about the selected client or company 
-	*/ 
-	  
+	 * clientInfo function - get the information about the selected client or company
+	 * @return void 
+	 */ 
 	public function clientInfo(){
 		$client_id =  $this->uri->segment(3);
 		if(!$this->Users_model->userloggedIn() ){
@@ -106,10 +99,10 @@ class Clients extends MY_Controller {
 	/**
 	 * editClients function - editing the alredy existing client or company 
 	 * @return string if it is not user with level admin
-	*/
+	 */
 	public function editClients(){
 		$client_id =  $this->uri->segment(3);
-		if(!$this->Users_model->userloggedIn() ){
+		if(!$this->Users_model->userloggedIn()){
 			redirect('clients/index');
 			die;
 		}
@@ -141,7 +134,7 @@ class Clients extends MY_Controller {
 	/**
 	 * deleteClient function - deletes the alredy existing client or company 
 	 * @return string if it is not user with level admin 
-	*/
+	 */
 	public function deleteClient(){
 		$user_info = $this->Users_model->usersLevel();
 		if($user_info ){
@@ -154,12 +147,11 @@ class Clients extends MY_Controller {
 		}else{
 			echo "You can't delete client, unles you are the admin!";
 		} 			
-	
 	}
 	/**
 	 * setRulesForClients function - sets the form_validation rules 
 	 * that are used in newClients and editClients functions
-	
+	 * @return void
 	 */
 	public function setRulesForClients(){
 		$this->load->library('form_validation');
@@ -167,7 +159,6 @@ class Clients extends MY_Controller {
 		$company_name = $this->input->post('company_name');
 		$client_first_name = $this->input->post('client_first_name');
 		$client_last_name = $this->input->post('client_last_name');
-		
 		if(!empty($company_name)){
 			$this->form_validation->set_rules('company_name', 'Company name', 'alphanumeric|xss_clean');
 		}
@@ -175,10 +166,7 @@ class Clients extends MY_Controller {
 			$this->form_validation->set_rules('client_first_name', 'Client first name', 'alpha|xss_clean');
 			$this->form_validation->set_rules('client_last_name', 'Client last name', 'alpha|xss_clean');
 		}	
-	
 		$this->form_validation->set_rules('client_phone', 'Client phone', 'required|numeric|xss_clean');
 		$this->form_validation->set_rules('client_email', 'Client email', 'required|valid_email|xss_clean');
-	
-		
 	}
 }
