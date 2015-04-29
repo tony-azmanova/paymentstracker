@@ -25,10 +25,10 @@ class Clients extends MY_Controller {
 			die;
 		}	
         $this->output->enable_profiler(TRUE);  
-    }
+	}
     
    
-    /**
+	/**
 	 * index function - the index function for the Clients controller 
 	 * @param integer $page number of page to begin 
 	 * @return void

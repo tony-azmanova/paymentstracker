@@ -138,21 +138,19 @@ class Invoices extends MY_Controller {
 			redirect('invoices/index');
 			die;
 		}
-		$total = $this->Invoices_model->totalInvoice($invoice_id);	
-		$data['items_info'] = $this->Items_model->itemInfo($invoice_id);
-		$data['total'] = $total;
-		$data['invoice_info'] = $this->Invoices_model->getInvoiceInfo($invoice_id);
-			print_r($total);
-		$this->loadView('invoices/show',$data);
 			
+		$data['items_info'] = $this->Items_model->itemInfo($invoice_id);
+		$data['total'] = $this->Invoices_model->totalInvoice($invoice_id);	
+		$data['invoice_info'] = $this->Invoices_model->getInvoiceInfo($invoice_id);
+		$this->loadView('invoices/show',$data);
 	}
 	
 	
-    /**
+	/**
 	 * deleteInvoice function - delete the alredy existing invoice 
 	 * @return string if it is not user with level admin 
 	 */
-    public function deleteInvoice(){
+	public function deleteInvoice(){
 		$user_info = $this->Users_model->usersLevel();
 		if($user_info){ 
 			$invoice_id =  $this->uri->segment(3);
@@ -165,7 +163,7 @@ class Invoices extends MY_Controller {
 		} 			
 	} 
 	
-	 /**
+	/**
 	 * editInvoice function - edit the alredy existing invoice 
 	 * @return string if it is not user with level admin 
 	 */
@@ -193,7 +191,6 @@ class Invoices extends MY_Controller {
 					$set_date = date('Y-m-d');
 				}
 				$data['set_date'] = $set_date;
-			
 				$data['invoice_id'] = $invoice_id;
 				$invoice_items = $this->Items_model->itemInfo($invoice_id);
 				$data['invoice_items'] = $invoice_items;
@@ -206,7 +203,6 @@ class Invoices extends MY_Controller {
 					$updated_invoice = $this->Invoices_model->updateInvoice($invoice_items,$invoice_id);
 					if($updated_invoice){
 						$data['success'] ="yey";
-						
 					}else{
 						$data['errors'] = TRUE;
 					}	
@@ -229,7 +225,6 @@ class Invoices extends MY_Controller {
 	 * @return array
 	 */
 	public function setRulesForInvoice(){
-		
 		$this->load->helper(array('form', 'url'));
 		$this->load->library('form_validation');
 			
@@ -239,32 +234,28 @@ class Invoices extends MY_Controller {
 		$this->form_validation->set_rules('transaction_type', 'Transaction', 'required|numeric|xss_clean');
 		$this->form_validation->set_rules('shop', 'Shop', 'required|numeric|xss_clean');
 		
-		
 		$field_properties = array(	
-									array(
-											'property'=>'type_id',
-											'human_name'=>'Item type',
-											'rules'=>'required|numeric'
-										),	
-									
-									
-									array(
-											'property'=>'quantity',
-											'human_name'=>'Quantity',
-											'rules'=>'required|numeric'
-										),
-									array(
-											'property'=>'item_price',
-											'human_name'=>'Price',
-											'rules'=>'required|numeric'
-										),	
-									
-									array(
-											'property'=>'item_name',
-											'human_name'=>'Item name',
-											'rules'=>'xss_clean'
+								array(
+										'property'=>'type_id',
+										'human_name'=>'Item type',
+										'rules'=>'required|numeric'
+									),	
+								array(
+										'property'=>'quantity',
+										'human_name'=>'Quantity',
+										'rules'=>'required|numeric'
+									),
+								array(
+										'property'=>'item_price',
+										'human_name'=>'Price',
+										'rules'=>'required|numeric'
+									),	
+								array(
+										'property'=>'item_name',
+										'human_name'=>'Item name',
+										'rules'=>'xss_clean'
 									)
-								);	
+							);	
 		$field = 'items';
 		$field_human_name="Items";
 		$field_rules = 'required|numeric';
@@ -272,7 +263,6 @@ class Invoices extends MY_Controller {
 		$items_array = $this->generateValidation($field,$field_properties,$field_human_name,$field_rules,$field_error);
 		
 		return $items_array;
-		
 	}
 	
 }
