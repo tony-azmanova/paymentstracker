@@ -1,23 +1,19 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-	/** 
-	* Shops Class 
-	* 
-	* @package Package Name 
-	* @subpackage Subpackage 
-	* @category Category 
-	* @author Tony Azmanova 
-	* @link http://localhost/payments/shops/index
-	*/ 
+/** 
+* Shops Class 
+* 
+* @package PaymentsTracker
+* @subpackage Shops
+* @category Shops
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Shops extends MY_Controller  {
 	
 	/**
-	 * __construct function -function that loads the
-	 * Shops_model and Invoices_model for the Shops controller 
-	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
-	 * 
+	 * __construct function - loads the Shops_model and Invoices_model
+	 * @return sring if the user is with status unactiv 
 	 */
-	 
 	public function __construct(){
         parent::__construct();
         $this->load->model('Shops_model');
@@ -31,11 +27,11 @@ class Shops extends MY_Controller  {
     }
     
     
-    /**
+	/**
 	 * index function - the index function for the Shops controller 
 	 * @param integer $page number of page to begin 
 	 */
-    public function index($page=1){
+	public function index($page=1){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('invoices/index');
 			die;
@@ -57,7 +53,7 @@ class Shops extends MY_Controller  {
 
 	/**
 	 * newShop function - add new shop
-	 * @return void
+	 * @return void|string returns void else if there is error returns string
 	 */
 	public function newShop(){
 		$this->load->helper('form');
@@ -74,25 +70,22 @@ class Shops extends MY_Controller  {
 				}else{
 					echo "Error in database!";	
 				}
-				
 			}
 		}	
-			$this->loadView('shops/new',$data);
+		$this->loadView('shops/new',$data);
 	}
 	
 	
 	/**
 	 * deleteShop function - delete the alredy existing shop
-	 * @return string if it is not user with level admin 
-	 *
-	 **/	
+	 * @return void|string returns void else if is not user with level admin 
+	 */	
 	public function deleteShop(){
 		$user_info = $this->Users_model->usersLevel();
 		if($user_info){ 
 			$shop_id =  $this->uri->segment(3);
 			$deleted_shop = $this->Shops_model->removeShop($shop_id);
 			if($deleted_shop){
-				
 				redirect("shops/index");
 			}
 		}else{
@@ -103,9 +96,9 @@ class Shops extends MY_Controller  {
 	
 	/**
 	 * editShop function - edit the alredy existing shop 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void else if is not user with level admin 
 	 *
-	 **/
+	 */
 	public function editShop(){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('items/index');
@@ -158,7 +151,7 @@ class Shops extends MY_Controller  {
 	 * setRulesForShops function - sets the form_validation rules 
 	 * that are used in newShop and editShop functions
 	 */
-    public function setRulesForShops(){
+	public function setRulesForShops(){
 		$this->form_validation->set_rules('shop_name', 'Name', 'required');
 		$this->form_validation->set_rules('shop_addres', 'Addres', 'required');
 		$this->form_validation->set_rules('shop_phone', 'Phone', 'required|numeric');

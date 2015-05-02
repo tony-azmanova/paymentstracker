@@ -1,34 +1,30 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 	
 /** 
- * Invoices_model Class
- *  
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/clients/index
- */ 
-	
+* Invoices_model Class
+* 
+* @package PaymentsTracker
+* @subpackage Invoices_model 
+* @category Invoices
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Invoices_model extends CI_Model {
 	
 	/**
-	 * __construct function -function that loads the database 
-	 * 
+	 * __construct function - loads the database 
 	 */
-	 
 	public function __construct(){
         parent::__construct();
         
         $this->load->database();
     }
     
-    /**
-     * buildSelect function - build  a select to be used in more than one function 
-	 * 
+	/**
+     * buildSelect function - build a select that will be used in more than one function 
+	 * @return void
 	 */
-    
-    public function buildSelect(){
+	public function buildSelect(){
 		$subquery = '(CASE WHEN 
 						SUM(items.item_price * items.quantity) > 
 							0 
@@ -37,11 +33,9 @@ class Invoices_model extends CI_Model {
 							0 
 						END)
 			as total_invoice';
-		
 		$this->db->select('invoices.id,shops.shop_name,invoices.date_invoices,
 		transactions.transaction_name,categories.category_name,
 		statuses.status_name,users.username, '. $subquery);
-
 		$this->db->from('invoices');
 		$this->db->join('shops','shops.id = invoices.shop_id','left');
 		$this->db->join('transactions','invoices.transaction = transactions.id','left');
@@ -53,13 +47,15 @@ class Invoices_model extends CI_Model {
 		$this->db->where('invoices.deleted','0');
 	}
 	
+	
 	/**
      * getAllInvoicesList function - get all the items for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
+	 * @param integer|null $page is null if it is not defined else is the number of 
+	 * the current page of the pagination
+	 * @param integer|null $limit is null if it is not defined else is the 
+	 * limit of results shown on the page 
 	 * @return array
 	 */
-
 	public function getAllInvoicesList($page=null,$limit=null){
 		$this->buildSelect();
 		$this->db->group_by('invoices.id');
@@ -71,11 +67,12 @@ class Invoices_model extends CI_Model {
 		return $results;	
 	}
 	
+	
 	/**
      * countIncomesList function - count the result for the pagination
-     * @return intiger
+     * @return integer
 	 */
-	public function countInvoiseList(){
+	public function countInvoicesList(){
 		$this->db->select('COUNT(*) as count',FALSE);
 		$this->db->where('invoices.deleted','0');
 		$result = $this->db->get('invoices')->row_array();
@@ -88,18 +85,16 @@ class Invoices_model extends CI_Model {
 	 */
 	public function getStatistics(){
 		$this->getAllInvoice();
-		$this->getAllIncomes();
-	
+		$this->Incomes_model->getAllIncomes();
 	}
 	
 	
 	/**
      * getAllInvoice function - get all the invoices for the pagination by date
-	 * @param string $start_date is null
-	 * @param string $end_date is null
+	 * @param string|null $start_date is null if it is not defined else is the selected start date
+	 * @param string|null $end_date is null if it is not defined else is the selected end date
 	 * @return array
 	 */
-	 
 	public function getAllInvoice($start_date=null,$end_date=null){
 		$this->db->select('SUM(items.item_price* items.quantity) as this_month');
 		$this->db->from('items');
@@ -129,27 +124,24 @@ class Invoices_model extends CI_Model {
      * getType function - get all transactions 
 	 * @return array
 	 */
-	 
 	public function getType(){
 		$this->db->select('transactions.transaction_name,transactions.id');
 		$this->db->from('transactions');
 		$result = $this->db->get()->result_array();
 		return $result;
-		
 	}
+	
 	
 	/**
      * getShop function - get all shops
 	 * @return array
 	 */
-	 
 	public function getShop(){
 		$this->db->select('shops.shop_name,shops.id');
 		$this->db->from('shops');
 		$this->db->where('shops.deleted','0');
 		$results = $this->db->get()->result_array();
 		return $results;
-		
 	}
 	
 	
@@ -157,37 +149,34 @@ class Invoices_model extends CI_Model {
      * getStatus function - get all status
 	 * @return array
 	 */
-	 
 	public function getStatus(){
 		$this->db->select('statuses.status_name,statuses.id');
 		$this->db->from('statuses');
 		$result = $this->db->get()->result_array();
 		return $result;
-		
 	}
+	
 	
 	/**
      * getCity function - get all cities
 	 * @return array
 	 */
-	 
 	public function getCity(){
-		
 		$this->db->select('cities.city_name,cities.id');
 		$this->db->from('cities');
 		$result = $this->db->get()->result_array();
 		return $result;
 	}
+	
+	
 	/**
      * insertNewInvoice function - insert in the database the new invoice
-	 * @param array $invoise_items the posted fields
+	 * @param array $invoise_items are the values of the input fields in Create new invoice
 	 * @return bool
 	 */
-	
 	public function insertNewInvoice($invoice_items){
 		
 		$this->db->trans_begin();
-		
 		$invoice = array(
 			'shop_id'=>$this->input->post('shop'),
 			'date_invoices'=>$this->input->post('invoice_date'),
@@ -197,9 +186,7 @@ class Invoices_model extends CI_Model {
 			'status_id'=>$this->input->post('status'),
 			'deleted'=>'0'
 		);
-	
 		$this->db->insert('invoices',$invoice);
-		
 		$invoice_id = $this->db->insert_id();
 	
 		$items_insert = array();
@@ -213,15 +200,14 @@ class Invoices_model extends CI_Model {
 				'deleted'=>'0'
 			);
 		}
-		
 		$this->db->insert_batch('items',$items_insert);
-		
-		if ($this->db->trans_status() !== FALSE) {
+		if($this->db->trans_status() !== FALSE){
 			$this->db->trans_commit();
 			return $invoice_id;
+		}else{
+			$this->db->trans_rollback();
+			return false;
 		}
-		$this->db->trans_rollback();
-		return false;
 	}
 	
 	
@@ -230,22 +216,19 @@ class Invoices_model extends CI_Model {
 	 * @param integer $invoice_id is the invoice id
 	 * @return array
 	 */
-	
 	public function getInvoiceInfo($invoice_id){ 
 	
 		$this->db->select('invoices.id,shops.shop_name,invoices.date_invoices,
-		transactions.transaction_name,transactions.id as transaction_id,categories.category_name,categories.id as category_id,
-		statuses.status_name,statuses.id as status_id,users.username,shops.shop_addres,shops.id as shop_id,shops.shop_phone,cities.city_name,
+		transactions.transaction_name,transactions.id as transaction_id,categories.category_name,
+		categories.id as category_id,statuses.status_name,statuses.id as status_id,
+		users.username,shops.shop_addres,shops.id as shop_id,shops.shop_phone,cities.city_name,
 		user_profile.first_name,user_profile.last_name,user_profile.email');
-
 		$this->db->from('invoices');
 		$this->db->join('shops','shops.id = invoices.shop_id','left');
 		$this->db->join('cities','shops.shop_city = cities.id','left');
 		$this->db->join('transactions','invoices.transaction = transactions.id','left');
 		$this->db->join('categories','categories.id = invoices.category_id','left');
 		$this->db->join('statuses','statuses.id = invoices.status_id','left');
-		//$this->db->join('items','invoices.id = items.invoice_id','left');
-		//$this->db->join('items_type','items.type = items_type.id','left');
 		$this->db->join('users','invoices.created_by_id = users.id','left');
 		$this->db->join('user_profile','users.profile_id = user_profile.id','left');
 		$this->db->where('invoices.deleted','0');
@@ -257,19 +240,20 @@ class Invoices_model extends CI_Model {
 	}
 	
 	
-	
 	/**
      * totalInvoice function - get total sum of the selected invoice
 	 * @param integer $invoice_id is the invoice id
 	 * @return array
 	 */
-	
 	public function totalInvoice($invoice_id){
 		$this->db->select('
 			(CASE 
-				WHEN SUM(items.item_price * items.quantity) > 0 
-					THEN SUM(items.item_price * items.quantity)
-				ELSE 0
+				WHEN SUM(items.item_price * items.quantity) >
+					0 
+				THEN 
+					SUM(items.item_price * items.quantity)
+				ELSE 
+					0
 			END) as total_invoice');
 		$this->db->from('items');
 		$this->db->join('invoices','items.invoice_id = invoices.id');
@@ -278,12 +262,12 @@ class Invoices_model extends CI_Model {
 		return $result;
 	}
 	
+	
 	/**
      * removeInvoices function - changes invoice to a deleted 
-	 * @param integer $invoice_id is the invoice id
+	 * @param integer $invoice_id is the id of the selected invoice
 	 * @return bool
 	 */
-	 
 	public function removeInvoice($invoice_id){
 		if($invoice_id){
 			$delete = array(
@@ -294,6 +278,7 @@ class Invoices_model extends CI_Model {
 			$deleted = array(
 				'deleted'=>'1'
 			);
+			
 			$this->db->where('items.invoice_id',$invoice_id);
 			$this->db->update('items',$deleted);
 			return true;
@@ -306,10 +291,9 @@ class Invoices_model extends CI_Model {
 	/**
      * updateInvoice function - insert in the database the changed invoice
 	 * @param integer $invoice_id is the invoice id
-	 * @param array $invoice_items
+	 * @param array $invoice_items  are the values of the input fields in Edit invoice
 	 * @return bool 
 	 */
-	 
 	public function updateInvoice($invoice_items,$invoice_id){
 		$this->db->trans_begin();
 		
@@ -340,10 +324,10 @@ class Invoices_model extends CI_Model {
 		
 		$this->db->insert_batch('items', $items_insert); 
 		
-		if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				return false;
-		} else 	{
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
+			return false;
+		}else{
 			$this->db->trans_commit();
 			return true;
 		}

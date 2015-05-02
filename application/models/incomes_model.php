@@ -1,34 +1,34 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /** 
- * Incomes_model Class 
- * 
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/clients/index
- */ 
+* Incomes_model Class 
+* 
+* @package PaymentsTracker
+* @subpackage Incomes_model 
+* @category Incomes
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Incomes_model extends CI_Model {
 
 	/**
-	 * __construct function -function that loads the database 
-	 * 
+	 * __construct function - loads the database 
 	 */
-	 
 	public function __construct(){
         parent::__construct();
-        
+     
         $this->load->database();
-    
     }
     
-    /**
-     * getIncomes function - get all the incomes for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
-	 */
     
-    public function getIncomes($page=null,$limit=null){
+	/**
+     * getIncomes function - get all the incomes for the pagination
+	 * @param integer|null $page is null if it is not defined else is the number of 
+	 * the current page of the pagination
+	 * @param integer|null $limit is null if it is not defined else is the 
+	 * limit of results shown on the page 
+	 * @return array
+	 */
+	public function getIncomes($page=null,$limit=null){
 		
 		$this->db->select('
 			incomes.id,incomes.date_incomes,incomes_categories.category_name,
@@ -55,16 +55,16 @@ class Incomes_model extends CI_Model {
 			$start = ($page-1)*$limit;
 			$this->db->limit($limit,$start);
 		}
-		
 		$results = $this->db->get()->result_array();
         return $results;
 		
 	}
+	
+	
 	/**
      * countIncomesList function - count the incomes for the pagination
-     * @return intiger
+     * @return integer
 	 */
-	 
 	public function countIncomesList(){
 		$this->db->select('COUNT(*) as count',FALSE);
 		$this->db->where('incomes.deleted','0');
@@ -72,11 +72,11 @@ class Incomes_model extends CI_Model {
 		return $result['count'];	
 	}
 	
+	
 	/**
      * getIncomesCategories function - get all categories
      * @return array
 	 */
-	 
 	public function getIncomesCategories(){
 		
 		$this->db->select('incomes_categories.id,incomes_categories.category_name');
@@ -88,34 +88,28 @@ class Incomes_model extends CI_Model {
 	
 	/**
      * getAllIncomes function - get all the incomes for the pagination by date
-	 * @param string $start_date is null
-	 * @param string $end_date is null
+	 * @param string|null $start_date is null if it is not defined else is the selected start date
+	 * @param string|null $end_date is null if it is not defined else is the selected end date
 	 * @return array
 	 */
-	 
 	public function getAllIncomes($start_date=null,$end_date=null){
 	
 		$this->db->select('SUM(incomes.total_income) as income_total');
 		$this->db->from('incomes');
-		if(!empty($start) && !empty($end)){
+		if(!empty($start_date) && !empty($end_date)){
 			$this->db->where('incomes.date_incomes BETWEEN "'. date('Y-m-d', strtotime($start_date)). '" and "'. date('Y-m-d', strtotime($end_date)).'"');
-		}
-		if(!empty($start_date_privios) && !empty($end_date_privios)){
-			$this->db->where('incomes.date_incomes BETWEEN "'. date('Y-m-d', strtotime($start_date_privios)). '" and "'. date('Y-m-d', strtotime($end_date_privios)).'"');
 		}
 		$this->db->where('incomes.deleted','0');
 		$results = $this->db->get()->row_array();
         return $results;
 	}
 	
-	
-	
+
 	/**
      * getInfoIncomes function - get the full details about the selected income 
-	 * @param string $income_id is the income id 
+	 * @param string $income_id is the income id of the selected income
 	 * @return array
 	 */
-	 
 	public function getInfoIncomes($income_id){
 		$this->db->select('incomes.id,incomes.date_incomes,incomes_categories.category_name,incomes_categories.id as category_id,
 		incomes_client.company_name,users.username,users.id as user_id,
@@ -153,7 +147,6 @@ class Incomes_model extends CI_Model {
      * getTotalIncomeByUser function - get the total incomes about the selected user
 	 * @return array
 	 */
-	 
 	public function getTotalIncomeByUser(){
 		$this->db->select('SUM(incomes.total_income) as total_income');
 		$this->db->from('incomes');
@@ -163,14 +156,13 @@ class Incomes_model extends CI_Model {
 		
 		$results = $this->db->get()->result_array();
         return $results;
-		
 	}
+	
 	
 	/**
      * insertNewIncomes function - insert in the database the new income
 	 * @return bool
 	 */
-	 
 	public function insertNewIncomes(){
 		$this->db->trans_begin();
 		
@@ -194,27 +186,24 @@ class Incomes_model extends CI_Model {
 			return true;
 		}
 	}
-	
-	
-	
+
 	
 	/**
      * updateIncomes function - insert in the database the changed income
-	 * @param integer $income_id is the income id
+	 * @param integer $income_id is the id of the selected income
 	 * @return bool
 	 */
-	 
 	public function updateIncomes($income_id){
 		if($income_id){
-			$incomes= array(
-						'date_incomes'=>$this->input->post('income_date'),
-						'income_category'=>$this->input->post('income_category'),
-						'income_user'=>$this->input->post('income_user'),
-						'income_client'=> $this->input->post('clients'),
-						'income_name'=>$this->input->post('income_name'),
-						'total_income'=>$this->input->post('total_income'),
-						'deleted'=>'0'
-					);
+			$incomes = array(
+								'date_incomes'=>$this->input->post('income_date'),
+								'income_category'=>$this->input->post('income_category'),
+								'income_user'=>$this->input->post('income_user'),
+								'income_client'=> $this->input->post('clients'),
+								'income_name'=>$this->input->post('income_name'),
+								'total_income'=>$this->input->post('total_income'),
+								'deleted'=>'0'
+							);
 					
 			$this->db->where('incomes.id',$income_id);
 			$this->db->update('incomes',$incomes);
@@ -227,19 +216,16 @@ class Incomes_model extends CI_Model {
 	
 	/**
      * removeIncomes function - changes income to a deleted 
-	 * @param integer $income_id is the income id
+	 * @param integer $income_id is the id of the selected income
 	 * @return bool
 	 */
-	 
 	public function removeIncomes($income_id){
 		if($income_id){
 			$deleted = array(
 				'deleted'=>'1'
 			);
-			
 			$this->db->where('incomes.id',$income_id);
 			$this->db->update('incomes',$deleted);
-			
 			return true;
 		}else{
 			return false;

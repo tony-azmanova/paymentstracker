@@ -1,23 +1,19 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-	/** 
-	* Statistics Class 
-	* 
-	* @package Package Name 
-	* @subpackage Subpackage 
-	* @category Category 
-	* @author Tony Azmanova 
-	* @link http://localhost/payments/statistics/index
-	*/ 
+/** 
+* Statistics Class 
+* 
+* @package PaymentsTracker
+* @subpackage Statistics
+* @category Statistics
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Statistics extends MY_Controller {
 	
 	/**
-	 * __construct function -function that loads the
-	 * Statistics_model for the Shops controller 
-	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
-	 * 
+	 * __construct function - loads the Statistics_model
+	 * @return sring if the user is with status unactiv  
 	 */
-	 
 	public function __construct(){
         parent::__construct();
         $this->load->model('Statistics_model');
@@ -30,17 +26,15 @@ class Statistics extends MY_Controller {
     }
     
     
-     /**
+	/**
 	 * index function - the index function for the Statistics controller 
 	 * @return void
-	 */
-	 
+	 */ 
     public function index(){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('invoices/index');
 			die;
 		}
-		
 		$start =  date('Y-m-01');
 		$end = date('Y-m-t'); 
 		$data['start_date_more_previos'] = date('Y-m-d', strtotime("first day of -2 month"));
@@ -50,23 +44,13 @@ class Statistics extends MY_Controller {
 		$data['start_date_this'] = $start;
 		$data['end_date_this'] = $end;
 		$statistics = $this->Statistics_model->getWholeStat();
-		/*$top_expenses = $this->Statistics_model->getTopExpenses();
-		$top_incomes = $this->Statistics_model->getTopIncomes();
-		$top_shops = $this->Statistics_model->topExpByShop();
-		$top_items = $this->Statistics_model->getExpByItem();
-		$top_categories = $this->Statistics_model->getExpByCategory();
-		$data['top_expenses'] = $top_expenses;
-		$data['top_incomes'] = $top_incomes;
-		$data['top_shops'] = $top_shops;
-		$data['top_items'] = $top_items;
-		$data['top_categories'] = $top_categories;*/
 		$data['statistics'] = $statistics;
 		
 		$this->loadView('statistics/statistics',$data);
 	}
 	
 	
-	 /**
+	/**
 	 * stats function - this function builds up the chart 
 	 * @param string $start_date start date for the chart
 	 * @param string $end_date end date for the chart
@@ -113,37 +97,6 @@ class Statistics extends MY_Controller {
 		$Test->drawPieLegend(310,15,$DataSet->GetData(),$DataSet->GetDataDescription(),25,250,25);  
 		 
 		$Test->Stroke();
-		
-		
-		
 	}
-    
-	/*public function myChart($incomes,$expenses){
-		$statistics = $this->Statistics_model->getWholeStat();
-		
-		//print_r($statistics); //die;
-		require_once(APPPATH.'/libraries/chart/pChart/pChart.class');
-		require_once(APPPATH.'/libraries/chart/pChart/pData.class');
-		$font_path = APPPATH.'/libraries/chart/';
-		
-		// Dataset definition   
-		$DataSet = new pData;  
-		$DataSet->AddPoint(array($incomes,$expenses),"Serie1");  
-		$DataSet->AddPoint(array("Incomes","Expenses"),"Serie2");  
-		$DataSet->AddAllSeries();  
-		$DataSet->SetAbsciseLabelSerie("Serie2");  
-		 
-		// Initialise the graph  
-		$Test = new pChart(500,200);  
-		$Test->drawFilledRoundedRectangle(7,7,373,193,5,240,240,240);  
-		$Test->drawRoundedRectangle(5,5,375,195,5,230,230,230);  
-		 
-		// Draw the pie chart  
-		$Test->setFontProperties($font_path."Fonts/tahoma.ttf",8);  
-		$Test->drawPieGraph($DataSet->GetData(),$DataSet->GetDataDescription(),200,90,110,PIE_PERCENTAGE,TRUE,60,30,10);  
-		$Test->drawPieLegend(310,15,$DataSet->GetData(),$DataSet->GetDataDescription(),25,250,25);  
-		 
-		$Test->Stroke();
-	}*/
     
 }    

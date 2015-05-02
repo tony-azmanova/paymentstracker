@@ -1,21 +1,18 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-	/** 
-	* Incomes Class 
-	* 
-	* @package Package Name 
-	* @subpackage Subpackage 
-	* @category Category 
-	* @author Tony Azmanova 
-	* @link http://localhost/payments/incomes/index
-	*/ 
+/** 
+* Incomes Class 
+* 
+* @package PaymentsTracker
+* @subpackage Incomes 
+* @category Incomes
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/ 
 class Incomes extends MY_Controller {
 	
-	 /**
-	 * __construct function -function that loads the
-	 * Incomes_model and Clients_model for the Incomes controller 
-	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
-	 * 
+	/**
+	 * __construct function - loads the Incomes_model and Clients_model
+	 * @return sring if the user is with status unactiv 
 	 */
 	public function __construct(){
         parent::__construct();
@@ -29,16 +26,16 @@ class Incomes extends MY_Controller {
         $this->output->enable_profiler(TRUE);  
     }
     
-    /**
+	/**
 	 * index function - the index function for the Incomes controller 
 	 * @param integer $page number of page to begin 
+	 * @return void
 	 */
     public function index($page=1){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('invoices/index');
 			die;
 		}
-		
 		$income_result = $this->Incomes_model->countIncomesList();
 		$this->load->library("pagination");
 		$config = array();
@@ -47,46 +44,41 @@ class Incomes extends MY_Controller {
 		$config["per_page"] = 3;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
-		
 		$this->pagination->initialize($config);
-
+		
 		$data['links']= $this->pagination->create_links();
-		$data['income_list'] = $this->Incomes_model->getIncomes($page,$config['per_page']);
-			
+		$data['income_list'] = $this->Incomes_model->getIncomes($page,$config['per_page']);	
 		$this->loadView('incomes/list',$data);
 		
 	}
-    
-     /**
-	 * incomeInfo function - get the information about the selected incomes
 	
+    
+	/**
+	 * incomeInfo function - get the information about the selected incomes
+	 * @return void
 	 */
     public function incomeInfo(){
-		
 		$income_id =  $this->uri->segment(3);
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('incomes/index');
 			die;
 		}	
 		$data['income_id'] = $income_id;
-
 		$data['incomes_info'] = $this->Incomes_model->getInfoIncomes($income_id);
-		
 		$this->loadView('incomes/show',$data);
 	
 	}
 	
 	
-    /**
+	/**
 	 * newIncome function - add new income
-	 *
+	 * @return void
 	 */
 	public function newIncome(){
-	   if(!$this->Users_model->userloggedIn() ){
+		if(!$this->Users_model->userloggedIn() ){
 			redirect('incomes/index');
 			die;
 		}
-		
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 		$all_users = $this->Users_model->allUsers();
@@ -100,7 +92,6 @@ class Incomes extends MY_Controller {
 			$set_user = $this_user['user_id'];
 			
 		}
-		
 		$incomes = $this-> Incomes_model->getIncomes();
 		$clients = $this->Clients_model->getClients();
 		$set_date = date('Y-m-d');
@@ -115,8 +106,7 @@ class Incomes extends MY_Controller {
 			if ($this->form_validation->run() !== FALSE) {
 				$new_income = $this->Incomes_model->insertNewIncomes();
 				if($new_income ){
-					$data['success'] = "YeeeeeehoOoo";
-					
+					$data['success'] = "Yey";
 				}else{
 					echo "Error in database!";	
 				}
@@ -126,11 +116,10 @@ class Incomes extends MY_Controller {
 	}
 	
 	
-	 /**
+	/**
 	 * editIncome function - edit the alredy existing incomes 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void or if is not user with level admin 
 	 */
-	
 	public function editIncome(){
 		$income_id =  $this->uri->segment(3);
 		if(!$this->Users_model->userloggedIn() ){
@@ -160,8 +149,7 @@ class Incomes extends MY_Controller {
 				if ($this->form_validation->run() !== FALSE) {
 					$update_income = $this->Incomes_model->updateIncomes($income_id);
 					if($update_income){
-						$data['success'] = "YeeeeeehoOoo";
-						
+						$data['success'] = "Yey";
 					}else{
 						echo "Error in database!";	
 					}
@@ -174,9 +162,9 @@ class Incomes extends MY_Controller {
 	}
 	
 	
-	 /**
+	/**
 	 * deleteIncome function - deletes the alredy existing incomes
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void else sting if it is not user with level admin 
 	 */
 	public function deleteIncome(){
 		$user_info = $this->Users_model->usersLevel();
@@ -192,9 +180,10 @@ class Incomes extends MY_Controller {
 	}
 	
 	
-	 /**
+	/**
 	 * setRulesForIncomes function - sets the form_validation rules 
 	 * that are used in newIncome and editIncome functions
+	 * @return void
 	 */
     public function setRulesForIncomes(){
 		
@@ -210,15 +199,12 @@ class Incomes extends MY_Controller {
 		}else{
 			$this->form_validation->set_rules('income_user', 'User', 'required|xss_clean');
 		}
-		
 	}
 	
 	
-	 /**
+	/**
 	 * username_check function - check if it is the same user that is editing the incomes 
-	 * 
-	 * 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void or if it is not user with level admin 
 	 */
 	public function username_check(){
 		$user_info = $this->Users_model->usersLevel();
@@ -226,7 +212,6 @@ class Incomes extends MY_Controller {
 		if(!$user_info ){
 			$this_user = $this->Users_model->userProfile();
 			$user_id = $this->Users_model->getUserId();
-	
 			if($user_set !== $user_id){
 				$this->form_validation->set_message('username_check','You can not add incomes for another user!');
 				return FALSE;
@@ -235,4 +220,5 @@ class Incomes extends MY_Controller {
 			}
 		}
 	}
+	
 }    

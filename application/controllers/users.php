@@ -2,21 +2,19 @@
 /** 
 * Users Class 
 * 
-* @package Package Name 
-* @subpackage Subpackage 
-* @category Category 
-* @author Tony Azmanova 
-* @link http://localhost/payments/users/index
+* @package PaymentsTracker
+* @subpackage Users 
+* @category Users
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
 */ 
 class Users extends MY_Controller {
+	
+	
 	/**
-	 * __construct function -function that loads the
-	 * Statistics_model for the Shops controller 
-	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
-	 * 
+	 * __construct function -loads the Statistics_model 
+	 * @return void
 	 */
-	 
 	public function __construct(){
         parent::__construct();
        
@@ -24,12 +22,12 @@ class Users extends MY_Controller {
         $this->output->enable_profiler(TRUE);
     }
     
-     /**
+    
+	/**
 	 * index function - the index function for the Users controller 
 	 * where if the user_id is not empty it is save in the session
-	 * It also checks the curent user level 
 	 * @param integer $page number of page to begin 
-	 * @return void 
+	 * @return void|string if the curent user level is admin returns void else string with error 
 	 */
 	public function index($page=1){
 		if(!empty($this->user_id)){
@@ -41,10 +39,8 @@ class Users extends MY_Controller {
 				echo "Admin arеa!";
 			}else{	
 				echo "You can't accses this page unles you are the admin";
-				
 			}
 		}	
-		
 		$users_result = $this->Users_model->countUsersList();
 		$this->load->library("pagination");
 		$config = array();
@@ -53,28 +49,24 @@ class Users extends MY_Controller {
 		$config["per_page"] = 2;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
-		
 		$this->pagination->initialize($config);
 
 		$data['links']= $this->pagination->create_links();
 		$all_users = $this->Users_model->getAllUsers($page,$config['per_page']);
 		$data['all_users'] = $all_users;
-		
 		$this->loadView('users/list',$data);
-	} 
+	}
 	 
-	 /**
-	 * log_in function - check the username and password  
+	
+	/**
+	 * log_in function - check the username and password for the login 
 	 * @return string if there is error
 	 */
-	 
-    public function log_in(){
-	
+	public function log_in(){
 		if($this->input->server('REQUEST_METHOD') =='POST'){
 			$username= $this->input->post('username');
 			$password= $this->input->post('password');
 			$login = $this->Users_model->usersLogin($username,$password);
-		
 			if($login){
 				redirect('invoices/index');
 			}else{
@@ -85,8 +77,8 @@ class Users extends MY_Controller {
 	
 	
 	/**
-	 * registerUser function - registrating   
-	 * @return string if there is error
+	 * registerUser function - registration of new user  
+	 * @return void|string if it is succsesful returns void else string with error 
 	 */
 	public function registerUser(){
 		
@@ -118,8 +110,8 @@ class Users extends MY_Controller {
 	
 	
 	/**
-	 * allUsers function - check the username and password  
-	 * @return void
+	 * allUsers function - get all users 
+	 * @return void|string if the curent user level is admin returns void else string with error 
 	 */
 	public function allUsers(){
 		if($this->Users_model->userloggedIn() ){
@@ -136,9 +128,10 @@ class Users extends MY_Controller {
 		$this->loadView('users/list',$data);
 	}
 	
+	
 	/**
 	 * changeProfile- changing the profile of the user
-	 * @return void
+	 * @return void|string if the curent user level is admin returns void else string with error 
 	 */
 	public function changeProfile(){
 		$user_id = $this->uri->segment(3);
@@ -167,6 +160,7 @@ class Users extends MY_Controller {
 		}
 	}
 	
+	
 	/**
 	 * check_username- callback function that check if the username is avaliable
 	 * @return bool
@@ -175,12 +169,10 @@ class Users extends MY_Controller {
 		$user_id = $this->uri->segment(3);
 		$username = $this->input->post('username');
 		$check = $this->Users_model->usernameCheck($username,$user_id);
-		
 		if($check){
 			$this->form_validation->set_message('check_username','This username alredy exists!');
 			return FALSE;
 		}else{
-	
 			return TRUE;
 		}
 	}
@@ -194,49 +186,39 @@ class Users extends MY_Controller {
 		$user_id = $this->uri->segment(3);
 		$email = $this->input->post('email');
 		$check_email = $this->Users_model->emailCheck($email,$user_id);
-		
 		if($check_email){
 			$this->form_validation->set_message('check_email','This email alredy exists!');
 			return FALSE;
 		}else{
-	
 			return TRUE;
 		}
-		
 	}
+	
 	
 	/**
 	 * setRulesForUser function - sets the form_validation rules 
 	 * that are used in changeProfile function
-	 * @return string if there is error
+	 * @return string|void if there is error else returns void
 	 */
 	public function setRulesForUser(){
 		
-			$user_info = $this->Users_model->usersLevel();
-			$user_profile = $this->Users_model->userProfile();
-			if($user_info){
-				
-				$this->form_validation->set_rules('username', 'Username','callback_check_username|alphanumeric|xss_clean');	
-				$this->form_validation->set_rules('status', 'Status', 'required|numeric|xss_clean');
-				$this->form_validation->set_rules('level', 'Level', 'required|numeric|xss_clean');
-				
-			}else{
-				
-				echo 'you can not edit this fields!';
-			}
-			if(($user_profile ) && $user_info){
-				
-				$this->form_validation->set_rules('email', 'Email', 'required|callback_check_email|valid_email|xss_clean');
-				$this->form_validation->set_rules('first_name', 'First name', 'required|alpha|xss_clean');
-				$this->form_validation->set_rules('last_name', 'Last name', 'required|alpha|xss_clean');	
-			}else{
-				echo "You can edit only your own profile!";
-				
-			}		
-		
-
+		$user_info = $this->Users_model->usersLevel();
+		$user_profile = $this->Users_model->userProfile();
+		if($user_info){
+			$this->form_validation->set_rules('username', 'Username','callback_check_username|alphanumeric|xss_clean');	
+			$this->form_validation->set_rules('status', 'Status', 'required|numeric|xss_clean');
+			$this->form_validation->set_rules('level', 'Level', 'required|numeric|xss_clean');
+		}else{
+			echo 'You can not edit this fields!';
+		}
+		if(($user_profile ) && $user_info){
+			$this->form_validation->set_rules('email', 'Email', 'required|callback_check_email|valid_email|xss_clean');
+			$this->form_validation->set_rules('first_name', 'First name', 'required|alpha|xss_clean');
+			$this->form_validation->set_rules('last_name', 'Last name', 'required|alpha|xss_clean');	
+		}else{
+			echo "You can edit only your own profile!";
+		}		
 	}
-	
 	
 	
 	/**
@@ -246,7 +228,6 @@ class Users extends MY_Controller {
 	public function usersProfile(){
 		if($this->Users_model->userloggedIn() ){
 			$user_id = $this->uri->segment(3);
-			
 			if($user_id){
 				$start_date =  date('Y-m-01');
 				$end_date = date('Y-m-t'); 
@@ -275,9 +256,9 @@ class Users extends MY_Controller {
 	 * logOut function - destroyes the session of the user so that he can log out
 	 * @return void
 	 */
-	
 	public function logOut(){
 		$this->session->sess_destroy();
-			redirect('invoices/index');
+		redirect('invoices/index');
 	}	
+	
 }

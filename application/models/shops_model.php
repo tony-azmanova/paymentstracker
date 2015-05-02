@@ -1,34 +1,33 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /** 
- * Shops_model Class 
- * 
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/clients/index
- */ 
+* Shops_model Class 
+* 
+* @package PaymentsTracker
+* @subpackage Shops_model
+* @category Shops
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/  
 class Shops_model extends CI_Model {
 	
-
 	/**
-	 * __construct function -function that loads the database 
-	 * 
+	 * __construct function - loads the database 
 	 */
 	public function __construct(){
         parent::__construct();
         
         $this->load->database();
-    
     }
     
-    /**
+	/**
      * getShops function - get all shops for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
+	 * @param integer|null $page is null if it is not defined else is the number of 
+	 * the current page of the pagination
+	 * @param integer|null $limit is null if it is not defined else is the 
+	 * limit of results shown on the page 
+	 * @return array
 	 */
-    
-    public function getShops($page=null,$limit=null){
+	public function getShops($page=null,$limit=null){
 	
 		$this->db->select('shops.id,shops.shop_name,shops.shop_addres,
 		shops.shop_phone,categories.category_name,cities.city_name,
@@ -51,7 +50,6 @@ class Shops_model extends CI_Model {
      * countShopsList function - count the result for the pagination
      * @return integer
 	 */
-	 
 	public function countShopsList(){
 		$this->db->select('COUNT(*) as count',FALSE);
 		$this->db->where('shops.deleted','0');
@@ -64,7 +62,6 @@ class Shops_model extends CI_Model {
 	 * @param integer $shop_id is the id of the selected shop 
 	 * @return array
 	 */
-	 
 	public function getForEditShops($shop_id){
 	
 		$this->db->select('shops.id,shops.shop_name,shops.shop_addres,
@@ -76,7 +73,6 @@ class Shops_model extends CI_Model {
 		if($shop_id){
 			$this->db->where('shops.id',$shop_id);
 		}
-		
 		$result = $this->db->get()->row_array();
 		return $result;
 	}
@@ -84,11 +80,10 @@ class Shops_model extends CI_Model {
 	/**
      * updateShop function - insert in the database the new shop
 	 * @param integer $shop_id is the id of the selected shop 
-	 * @return array
+	 * @return bool
 	 */
-	 
     public function insertNewShop(){
-	
+		
 		$shops= array(
 			'shop_name'=>$this->input->post('shop_name'),
 			'shop_addres'=>$this->input->post('shop_addres'),
@@ -98,8 +93,14 @@ class Shops_model extends CI_Model {
 			'deleted'=>'0'
 			);
 			
-		$result = $this->db->insert('shops',$shops);
-		return $result;
+		$this->db->insert('shops',$shops);
+		
+		$i = $this->db->affected_rows();
+		if($i > 0 ){
+			return true;
+		}else{	
+			return false;
+		}
 	}
 
 	/**
@@ -107,10 +108,12 @@ class Shops_model extends CI_Model {
 	 * @param integer $shop_id is the id of the selected shop 
 	 * @return bool
 	 */
-
 	public function updateShop($shop_id){
-		if($shop_id){
-
+		$this->db->trans_begin();
+		
+		if(!$shop_id){
+			die;
+		}else{
 			$update_shops = array(
 				'shop_name'=>$this->input->post('shop_name'),
 				'shop_addres'=>$this->input->post('shop_addres'),
@@ -123,18 +126,20 @@ class Shops_model extends CI_Model {
 			$this->db->where('shops.id',$shop_id);
 			
 			$this->db->update('shops',$update_shops);	
-			return true;
-		}else{
-			return false;
+			
+			if($this->db->trans_status() !== FALSE){
+				$this->db->trans_commit();
+			}else{
+				$this->db->trans_rollback();
+				return false;
+			}
 		}
-		
 	}
 	
 	/**
      * removeShop function -changes shop to a deleted 
 	 * @param integer $shop_id is the id of the selected shop 
 	 */
-	 
 	public function removeShop($shop_id){
 		if($shop_id){
 			$deleted = array(
@@ -146,7 +151,6 @@ class Shops_model extends CI_Model {
 		}else{
 			return false;
 		}
-		
 	}
     
 }    

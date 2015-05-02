@@ -43,6 +43,8 @@ class MY_Controller extends CI_Controller {
 		$this->load->view('common/footer',$data);
 		
 	}
+	
+	
 	/**
 	 * Custom validation rules for separate array field validation and separate error messages
 	 * @param array $field the names of the field
@@ -90,7 +92,6 @@ class MY_Controller extends CI_Controller {
 	 * @return bool
 	 *
 	 **/
-	
 	public function required_items($str,$field_error) {
 		$this->form_validation->set_message('required_items', $field_error);
 		return false;

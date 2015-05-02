@@ -1,14 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /** 
- * Users_model Class 
- * 
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/users/index
- */ 
-
+* Users_model Class 
+* 
+* @package PaymentsTracker
+* @subpackage Users_model
+* @category Users
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/  
 class Users_model extends CI_Model {
 	
 	protected $user_id;
@@ -16,10 +15,8 @@ class Users_model extends CI_Model {
 	protected $id_profile;
 	
 	/**
-	 * userId function -function that sets the curent users id 
-	 * in the session
+	 * userId function -function that sets the curent users id in the session
 	 */
-	 
 	private function userId($user_id){
 		$this->session->set_userdata('user_id',$user_id);
 		$this->user_id = $user_id;
@@ -29,9 +26,8 @@ class Users_model extends CI_Model {
 	/**
 	 * __construct function -function that loads the database and session library
 	 *  also give the curent users profile information as checking the session userdata for the users id
-	 * 
+	 * @return void
 	 */
-	 
 	public function __construct(){
         parent::__construct();
         
@@ -45,13 +41,11 @@ class Users_model extends CI_Model {
     }
     
   
-    /**
-	 * getUserId function -function that checks if the users id is empty
-	 * @return integer - if the user id is not empty returns this user id  
+	/**
+	 * getUserId function - check if the users id is empty
+	 * @return integer|bool - if the user id is not empty returns this user id else returns bool 
 	 */
-	 
-    public function getUserId(){
-		
+	public function getUserId(){
 		if(!empty($this->user_id)){
 			return $this->user_id;
 		}else{
@@ -60,12 +54,11 @@ class Users_model extends CI_Model {
 	}	
     
     
-    /**
-	 * userloggedIn function -function that checks if the users id is in the curent session
+	/**
+	 * userloggedIn function - check if the users id is in the curent session
 	 * @return bool
 	 */
-	 
-    public function userloggedIn(){
+	public function userloggedIn(){
 		
 		if(!empty($this->user_id)){
 			return true;
@@ -75,10 +68,9 @@ class Users_model extends CI_Model {
 	}
 	
 	/**
-	 * usersLevel function - checks if the level of the curent user is 0(admin)
+	 * usersLevel function - check if the level of the curent user is 0(admin)
 	 * @return bool
 	 */
-	 
 	public function usersLevel(){
 		
 		$this->db->select('users.level,users.id as user_id');
@@ -95,10 +87,9 @@ class Users_model extends CI_Model {
 	}
 	
 	/**
-	 * userStatus function - checks if the status of the curent user is unactiv(1)
+	 * userStatus function - check if the status of the curent user is unactiv(1)
 	 * @return bool
 	 */
-	 
 	public function userStatus(){
 		$this->db->select('users.status');
 		$this->db->from('users');
@@ -115,14 +106,13 @@ class Users_model extends CI_Model {
 	}
 	
 	/**
-	 * usersLogin function - checks if the user is login
+	 * usersLogin function - check if the user is login
 	 * @param string $username is the username from the input field in the login area
 	 * @param string $password is the password from the input field in the login area
 	 * @return integer|bool - if there is a user with $username and $password in the database we set 
 	 * the user id in the session, else returns bool
 	 */
-	 
-    public function usersLogin($username,$password){
+	public function usersLogin($username,$password){
 		
 		$this->db->select('id');
 		$this->db->from('users');
@@ -133,7 +123,6 @@ class Users_model extends CI_Model {
 		if(!empty($user_id)){
 			$this->session->set_userdata('user_id',$user_id['id']);
 			$this->userId($user_id['id']);
-			
 			return $this->user_id;
 		}else{	
 			return false;
@@ -142,25 +131,22 @@ class Users_model extends CI_Model {
 	
 	
 	/**
-	 * insertNewUser function - makes the insert in to the database 
+	 * insertNewUser function - make the insert in to the database 
 	 * as it gives the new user status 1(unactiv) and level 1(user)
 	 * @return bool
 	 */
-	 
 	public function insertNewUser(){
 		
 		$this->db->trans_begin();
-		
+	
 		$user_profile = array(
 				'first_name'=>$this->input->post('first_name'),
 				'last_name'=>$this->input->post('last_name'),
 				'email'=>$this->input->post('email')
 			);
-			
 		$this->db->insert('user_profile',$user_profile);
 		
 		$profile_id = $this->db->insert_id();
-		
 		$user = array(
 				'username'=>$this->input->post('username'),
 				'password'=>$this->input->post('password'),
@@ -168,32 +154,37 @@ class Users_model extends CI_Model {
 				'level'=>'1',
 				'status'=>'1'
 			);
-		
 		$this->db->insert('users',$user);
-		
-		if ($this->db->trans_status() === FALSE) {
-	
+		if($this->db->trans_status() === FALSE){
+			$this->db->trans_rollback();
 			return false;
-		} else {
+		}else{
 			$this->db->trans_commit();
 			return true;
 		}
 	}
+	
+	
 	/**
      * getAllUsers function - get all users for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
+	 * @param integer|null $page is null if it is not defined else is the number of 
+	 * the current page of the pagination
+	 * @param integer|null $limit is null if it is not defined else is the 
+	 * limit of results shown on the page 
 	 * @return array
 	 */
-	 
 	public function getAllUsers($page=null,$limit=null){
 		
 		$this->db->select('users.username,users.id as user_id,user_profile.first_name,
 		user_profile.last_name,user_profile.email,users.status,
 			SUM(incomes.total_income) as total_income,
 				(CASE 
-					WHEN total_income IS NULL THEN "-"
-					ELSE total_income 
+					WHEN total_income 
+						IS NULL 
+					THEN 
+						"-"
+					ELSE 
+						total_income 
 				END),
 			(SELECT 
 				SUM(items.item_price * items.quantity) as total_exspenses
@@ -206,7 +197,6 @@ class Users_model extends CI_Model {
 		$this->db->from('users');
 		$this->db->join('incomes',' users.id = incomes.income_user','left');
 		$this->db->join('user_profile','users.profile_id = user_profile.id');
-		
 		$this->db->group_by('users.id');
 		if(!empty($page)) {
 			$start = ($page-1)*$limit;
@@ -214,16 +204,12 @@ class Users_model extends CI_Model {
 		}
 		$results = $this->db->get()->result_array();
 		return $results;
-		
 	}
 	
 	/**
-     * getAllUsers function - get all users for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
+     * getAllUsers function - get all users 
 	 * @return array
 	 */
-	
 	public function allUsers(){
 		$this->db->select('users.id as users_id,users.username');
 		$result = $this->db->get('users')->result_array();
@@ -235,10 +221,8 @@ class Users_model extends CI_Model {
      * countClientsList function - count the result for the pagination
      * @return integer
 	 */
-	 
 	public function countUsersList(){
 		$this->db->select('COUNT(*) as count',FALSE);
-		
 		$result = $this->db->get('users')->row_array();
 		return $result['count'];	
 	}
@@ -249,7 +233,6 @@ class Users_model extends CI_Model {
 	 * @return array
 	 */
     public function userProfile(){
-		
 		if(!$this->userloggedIn()) {
 			return false;
 		}
@@ -258,17 +241,15 @@ class Users_model extends CI_Model {
 		$this->db->join('user_profile','users.profile_id = user_profile.id');
 		$this->db->where('users.id',$this->user_id);
 		$results = $this->db->get()->row_array();
-		
 		return $results;
-	
 	}	
+	
 	
 	/**
      * userInfo function - gives information about the selectet user
      * @param integer $user_id is the id of the selectet user
 	 * @return array
 	 */
-	 
 	public function userInfo($user_id){
 		
 		if(!$user_id){
@@ -282,13 +263,9 @@ class Users_model extends CI_Model {
 			$this->db->join('levels','users.level = levels.id','left');
 			$this->db->join('status_user','users.status = status_user.id','left');
 			$this->db->where('users.id',$user_id);
-		
 			$results = $this->db->get()->row_array();
-
 			return $results;
 		}
-			
-		
 	}
 	
 	
@@ -298,26 +275,24 @@ class Users_model extends CI_Model {
 	 * @return array
 	 */
 	public function getStatusUsers(){
-		
 		$this->db->select('status_user.status_name,status_user.id as status_id');
 		$this->db->from('status_user');
 		$result = $this->db->get()->result_array();
 		return $result;
 	}
 	
+	
 	/**
      * getLevelsUsers function - get all the levels 
 	 * @return array
 	 */
-	
 	public function getLevelsUsers(){
-		
 		$this->db->select('levels.level_name,levels.id as level_id');
 		$this->db->from('levels');
-		
 		$result = $this->db->get()->result_array();
 		return $result;
 	}
+	
 	
 	/**
      * usernameCheck function - check if there is another user that have the same username
@@ -325,10 +300,7 @@ class Users_model extends CI_Model {
      * @param integer $user_id is the selected users id
 	 * @return bool
 	 */
-	 
-	 
 	public function usernameCheck($username,$user_id){
-		
 		if(empty($username)){
 			die;
 		}
@@ -346,16 +318,13 @@ class Users_model extends CI_Model {
 		}
 	}
 	
-	
-    /**
+	/**
      * emailCheck function - check if there is another user that have the same email
      * @param string $email is the email from the input field in the users/edit
      * @param integer $user_id is the selected users id
 	 * @return bool
 	 */
-    
     public function emailCheck($email,$user_id){
-		
 		if(empty($email)){
 			die;
 		}
@@ -374,29 +343,26 @@ class Users_model extends CI_Model {
 		}
 	}
 	
-   /**
+	
+	/**
      * userProfileId function -gives information about the selectet user
      * @param integer $user_id is the id of the selectet user
 	 * @return array
 	 */
-   
 	public function userProfileId($user_id){
 		$this->db->select('users.profile_id as profile_id');
 		$this->db->from('users');
 		$this->db->where('users.id',$user_id);
 		$result = $this->db->get()->row_array();
-		
 		return $result;
-		
 	}
 	
 	/**
-     * cahgeUser function - makes the insert and updare in to the database with the changes about the selectet user
+     * cahgeUser function - make the update in the database with the changes about the selectet user
      * @param integer $user_id is the id of the selectet user
      * @param array $user_info are the post values that are coming from users/edit
 	 * @return bool
 	 */
-    
     public function cahgeUser($user_id,$users_info){
 		
 		$user_info = $this->Users_model->usersLevel();
@@ -413,7 +379,6 @@ class Users_model extends CI_Model {
 				'level'=>$this->input->post('level'),
 				'status'=>$this->input->post('status')
 			);
-				
 			$this->db->where('users.id',$user_id);
 			$this->db->update('users',$change);
 			
@@ -427,7 +392,6 @@ class Users_model extends CI_Model {
 				'first_name'=>$users_info['first_name'],
 				'last_name'=>$users_info['last_name']
 			);
-			
 			$this->db->insert('users_edit',$users_edit);
 			
 			$change_user_profile = array(
@@ -435,11 +399,10 @@ class Users_model extends CI_Model {
 				'last_name'=>$this->input->post('last_name'),
 				'email'=>$this->input->post('email')
 				);
-
 			$this->db->where('user_profile.id',$id_profile['profile_id']);
 			$this->db->update('user_profile',$change_user_profile);
 			
-			if ($this->db->trans_status() !== FALSE) {
+			if($this->db->trans_status() !== FALSE){
 				$this->db->trans_commit();
 				return true;
 			}else{

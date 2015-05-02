@@ -14,7 +14,7 @@ class Clients extends MY_Controller {
 	/**
 	 * __construct function - loads the Clients_model 
 	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
+	 * @return sring if the user is with status unactiv 
 	 */
 	public function __construct(){
         parent::__construct();
@@ -33,7 +33,7 @@ class Clients extends MY_Controller {
 	 * @param integer $page number of page to begin 
 	 * @return void
 	 */
-    public function index($page=1){
+	public function index($page=1){
 		if(!$this->Users_model->userloggedIn() ){
 			redirect('invoices/index');
 			die;
@@ -53,6 +53,7 @@ class Clients extends MY_Controller {
 		$data['clients'] = $clients;
 		$this->loadView('clients/list',$data);
 	}
+	
 	
 	/**
 	 * newClients function - add a new client or company 
@@ -79,6 +80,7 @@ class Clients extends MY_Controller {
 		} 
 		$this->loadView('clients/new',$data);
 	}
+	
 	  
 	/**
 	 * clientInfo function - get the information about the selected client or company
@@ -96,9 +98,10 @@ class Clients extends MY_Controller {
 		$this->loadView('clients/show',$data);
 	}
 	
+	
 	/**
 	 * editClients function - editing the alredy existing client or company 
-	 * @return string if it is not user with level admin
+	 * @return void|string returns void or if is not user with level admin 
 	 */
 	public function editClients(){
 		$client_id =  $this->uri->segment(3);
@@ -131,9 +134,10 @@ class Clients extends MY_Controller {
 		}	
 	}
 	
+	
 	/**
 	 * deleteClient function - deletes the alredy existing client or company 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void or if is not user with level admin 
 	 */
 	public function deleteClient(){
 		$user_info = $this->Users_model->usersLevel();
@@ -148,6 +152,8 @@ class Clients extends MY_Controller {
 			echo "You can't delete client, unles you are the admin!";
 		} 			
 	}
+	
+	
 	/**
 	 * setRulesForClients function - sets the form_validation rules 
 	 * that are used in newClients and editClients functions

@@ -12,8 +12,7 @@ class Invoices extends MY_Controller {
 	
 	/**
 	 * __construct function - loads the Invoices_model, Items_model and Incomes_model
-	 * @param array $user_stat check if the user is with activ status
-	 * @return sring if the user is with status inactiv 
+	 * @return sring if the user is with status unactiv 
 	 */
 	public function __construct(){
 		
@@ -60,7 +59,7 @@ class Invoices extends MY_Controller {
 
 	/**
 	 * newInvoice function - add new invoice
-	 * @return void
+	 * @return void|string returns void else if there is error returns string
 	 */
 	public function newInvoice(){
 
@@ -148,7 +147,7 @@ class Invoices extends MY_Controller {
 	
 	/**
 	 * deleteInvoice function - delete the alredy existing invoice 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void else if is not user with level admin 
 	 */
 	public function deleteInvoice(){
 		$user_info = $this->Users_model->usersLevel();
@@ -165,7 +164,7 @@ class Invoices extends MY_Controller {
 	
 	/**
 	 * editInvoice function - edit the alredy existing invoice 
-	 * @return string if it is not user with level admin 
+	 * @return void|string returns void else if is not user with level admin 
 	 */
 	public function editInvoice(){
 		if(!$this->Users_model->userloggedIn() ){

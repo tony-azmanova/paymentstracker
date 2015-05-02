@@ -1,21 +1,19 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /** 
- * Clients_model Class 
- * 
- * @package Package Name 
- * @subpackage Subpackage 
- * @category Category 
- * @author Tony Azmanova 
- * @link http://localhost/payments/clients/index
- */ 
+* Clients_model Class 
+* 
+* @package PaymentsTracker
+* @subpackage Clients_model
+* @category Clients
+* @author Tony Azmanova <layela@abv.bg>
+* @link http://tonyarticles.com
+*/  
 class Clients_model extends CI_Model {
 	
 	/**
-	 * __construct function -function that loads the database 
-	 * 
-	 **/
-	 
+	 * __construct function - loads the database 
+	 */
 	public function __construct(){
         parent::__construct();
         
@@ -23,14 +21,15 @@ class Clients_model extends CI_Model {
     }
     
     
-    /**
+	/**
      * getClients function - get all clients/companies for the pagination
-	 * @param intiger $page is null
-	 * @param intiger $limit is null
+	 * @param integer|null $page is null if it is not defined else is the number of 
+	 * the current page of the pagination
+	 * @param integer|null $limit is null if it is not defined else is the 
+	 * limit of results shown on the page 
 	 * @return array
 	 */
-	 
-    public function getClients($page=null,$limit=null){
+	public function getClients($page=null,$limit=null){
 		
 		$this->db->select('incomes_client.id,incomes_client.company_name,
 		incomes_client.first_name,incomes_client.last_name,
@@ -52,7 +51,6 @@ class Clients_model extends CI_Model {
 			END) as client
 		',FALSE);
 		$this->db->from('incomes_client');
-		
 		if(!empty($page)) {
 			$start = ($page-1)*$limit;
 			$this->db->limit($limit,$start);
@@ -61,7 +59,6 @@ class Clients_model extends CI_Model {
 		$this->db->group_by('incomes_client.id');
 		$results = $this->db->get()->result_array();
 		return $results;	
-		
 	}
 	
 	
@@ -69,7 +66,6 @@ class Clients_model extends CI_Model {
      * countClientsList function - count the result for the pagination
      * @return integer
 	 */
-	 
 	public function countClientsList(){
 		$this->db->select('COUNT(*) as count',FALSE);
 		$this->db->where('incomes_client.deleted','0');
@@ -80,9 +76,8 @@ class Clients_model extends CI_Model {
 	
 	/**
      * insertNewClient function - insert in the database the new client/company
-	 * @return integer 
+	 * @return bool
 	 */
-	 
 	public function insertNewClient(){
 		
 		$clients = array(
@@ -93,9 +88,14 @@ class Clients_model extends CI_Model {
 				'phone'=>$this->input->post('client_phone'),
 				'deleted'=>'0'
 				);
-		$results = $this->db->insert('incomes_client',$clients);
+		$this->db->insert('incomes_client',$clients);
 		
-		return $results;
+		$i = $this->db->affected_rows();
+		if($i > 0 ){
+			return true;
+		}else{	
+			return false;
+		}
 	}
 	
 	
@@ -104,12 +104,10 @@ class Clients_model extends CI_Model {
 	 * @param string $client_id is the client/company id 
 	 * @return array
 	 */
-	 
 	public function getClientInfo($client_id){
 		$this->db->select('incomes_client.id,incomes_client.company_name,
 		incomes_client.first_name,incomes_client.last_name,
-		incomes_client.email,incomes_client.phone,
-		');
+		incomes_client.email,incomes_client.phone');
 		$this->db->from('incomes_client');
 		if($client_id){
 			$this->db->where('incomes_client.id',$client_id);
@@ -117,17 +115,21 @@ class Clients_model extends CI_Model {
 		$this->db->where('incomes_client.deleted','0');
 		$results = $this->db->get()->row_array();
 		return $results;	
-	
 	}
+	
 	
 	/**
      * updateClient function - update in the database the changed client/company
 	 * @param string $client_id is the client/company id 
 	 * @return bool 
 	 */
-	 
 	public function updateClient($client_id){
-		if($client_id){
+		
+		if(!$client_id){
+			die;
+		}else{
+			$this->db->trans_begin();
+			
 			$clients = array(
 						'company_name'=>$this->input->post('company_name'),
 						'first_name'=>$this->input->post('client_first_name'),
@@ -138,19 +140,22 @@ class Clients_model extends CI_Model {
 						);
 			$this->db->where('incomes_client.id',$client_id);	
 			$this->db->update('incomes_client',$clients);
-			return true;
-		}else{
-			return false;
-		}	
+			
+			if($this->db->trans_status() !== FALSE){
+				$this->db->trans_commit();
+			}else{
+				$this->db->trans_rollback();
+				return false;
+			}	
+		}
     }
     
-    /**
+	/**
      * removeClients function - delete cliens  
 	 * @param integer $client_id is the client id
 	 * @return bool
 	 */
-	 
-    public function removeClients($client_id){
+	public function removeClients($client_id){
 		if($client_id){
 		$deleted = array(
 				'deleted'=>'1'
