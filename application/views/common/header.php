@@ -6,14 +6,52 @@
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 	<style>
 	
 	.loading {
 	
 		background-color:#000000;
 		
-	}	
+	}
+	
+	.container_invoices{
+		
+		background-color:#F5F5F5;
+		border: 2px #87CEFA; 
+		
+	}
+
+	.col-sm-5{
+		border-top: 2px solid #708090;
+		background-color:#337ab7;
+	}
+	
+	.col-xs-5{
+		
+		border-top: 2px solid #708090;
+		background-color:#337ab7;
+	}
+	
+	.col-sm-7{
+		border-top: 2px solid #708090;
+		
+	}
+	.col-md-2{
+		border-top: 2px solid #708090;
+	
+	}
+	
+	.col-md-1{
+		border-top: 2px solid #708090;
+		
+	}
+	 
+	.hidden-md{
+		
+		
+	} 
+	 
 	</style>
 	
 	
@@ -22,46 +60,16 @@
 			<script type="text/javascript" src="<?php echo site_url(); ?>assets/js/<?php echo $js_file;?>"></script>	
 		<? } ?>	
 	<? } ?>
-	
 			
-	<style type="text/css">
-			
-		
-		.main_menu{
-			margin: 20px;
-		}
-
-		.side_menu{
-			
-			margin: 20px;
-		}
-	
-		.content{
-			text-align: center;
-		}
-		
-		
-		.statistics_menu{
-			
-			margin: 20px;
-		}
-		
-	</style>
-			
-		
-		
 	</head>
 	
 	<body>
-	<script>
-	$(document).on({
-		ajaxStart: function() { $('body').addClass("loading");    },
-		ajaxStop: function() { $('body').removeClass("loading"); }    
-	});
-	
-	</script>	
-		
-		
+		<script>
+			$(document).on({
+				ajaxStart: function() { $('body').addClass("loading");    },
+				ajaxStop: function() { $('body').removeClass("loading"); }    
+			});
+		</script>	
 		
 		<h1>Payments</h1>
 		<?php if(isset($succsesfully)) { ?>
