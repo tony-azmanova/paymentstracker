@@ -15,7 +15,7 @@
 		
 	}
 	
-	.container_invoices{
+	.container_list{
 		
 		background-color:#F5F5F5;
 		border: 2px #87CEFA; 
@@ -42,15 +42,14 @@
 	
 	}
 	
+	.col-md-4{
+		border-top: 2px solid #708090;
+	
+	}
 	.col-md-1{
 		border-top: 2px solid #708090;
 		
 	}
-	 
-	.hidden-md{
-		
-		
-	} 
 	 
 	</style>
 	

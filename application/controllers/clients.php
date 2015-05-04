@@ -43,7 +43,7 @@ class Clients extends MY_Controller {
 		$config = array();
 		$config["base_url"] = base_url('clients/page/');
 		$config["total_rows"] = $clients_result;
-		$config["per_page"] = 1;
+		$config["per_page"] = 3;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
 		$this->pagination->initialize($config);
@@ -73,6 +73,7 @@ class Clients extends MY_Controller {
 				$new_client = $this->Clients_model->insertNewClient();
 				if($new_client){
 					$data['success'] = "Yey";
+					redirect("clients/editClients/".$new_client);
 				}else{
 					echo "Error in database!";	
 				}
@@ -141,12 +142,14 @@ class Clients extends MY_Controller {
 	 */
 	public function deleteClient(){
 		$user_info = $this->Users_model->usersLevel();
+		
 		if($user_info ){
 			$client_id =  $this->uri->segment(3);
 			$deleted_client = $this->Clients_model->removeClients($client_id);
 			if($deleted_client){
-				$data['success'] ="yey";
-				redirect("clients/list",$data);
+				
+				redirect('clients/index');
+				
 			}
 		}else{
 			echo "You can't delete client, unles you are the admin!";

@@ -35,8 +35,8 @@
 		<?php if(isset($succses)) { ?>
 			<div style="background:#00FF00;">Success!</div>
 		<?php } ?>
-		<div class= "container_invoices">
-			<div class = "row" style="background:#337ab7;"  >
+		<div class= "container_list">
+			<div class = "row" style="background:#337ab7;">
 				<div class= "visible-md col-md-2">Shops</div>
 				<div class= "visible-md col-md-2">Date</div>
 				<div class= "visible-md col-md-2">Type</div>
@@ -86,23 +86,21 @@
 					<a href="<?php echo site_url('invoices/deleteInvoice/'.$list['id']);?>">DELETE</a>
 					<a href="<?php echo site_url('invoices/invoiceInfo/'.$list['id']);?>">INFO</a>
 				</div>	
-			</div>	
 			<?php } ?>
+			</div>
 		</div>
 		<br>
 		<p><?php echo $links; ?></p><br>
-	<a href="<?php echo site_url('invoices/newInvoice');?>">Add new invoice!</a><br>
-	<div id="chart_container">
-		Total invoices :<?php echo $invoice['this_month'];?>
-			
-		and total incomes: <?php echo $incomes['income_total'];?>
+		
+		<a href="<?php echo site_url('invoices/newInvoice');?>">Add new invoice!</a><br>
+		<div id="chart_container">
+			Total invoices :<?php echo $invoice['this_month'];?>
+				
+			and total incomes: <?php echo $incomes['income_total'];?>
+		
+		</div>
+		
+		<a href="#" id="this_month">This month</a>
+		<a href="#" id="previous_month">Previous month</a>
+		<a href="#" id="two_months_ago">2 months ago</a>
 	
-	</div>
-	<a href="#" id="this_month">This month</a>
-	<a href="#" id="previous_month">Previous month</a>
-	<a href="#" id="two_months_ago">2 months ago</a>
-	
-	
-	</body>	
-	
-</html>

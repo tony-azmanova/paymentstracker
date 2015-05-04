@@ -34,21 +34,19 @@ class Clients_model extends CI_Model {
 		$this->db->select('incomes_client.id,incomes_client.company_name,
 		incomes_client.first_name,incomes_client.last_name,
 		incomes_client.email,incomes_client.phone,
-			(CASE 
-				WHEN company_name IS NULL 
-					THEN ""	
-				ELSE company_name 
-			END) as company_name,
-			(CASE 
-				WHEN first_name IS NULL 
-					THEN ""
-				ELSE GROUP_CONCAT(company_name,",",first_name,",",last_name)  
-			END) as client,
-			(CASE 
-				WHEN last_name IS NULL 
-					THEN "" 
-				ELSE GROUP_CONCAT(company_name,",",first_name,",",last_name)  
-			END) as client
+			
+			(CASE WHEN incomes_client.company_name is NULL THEN
+				"-" ELSE incomes_client.company_name
+			END) as company,
+			(CASE WHEN first_name is NULL THEN 
+				"-" ELSE 
+				first_name
+			END) as first_name,
+			(CASE WHEN last_name is NULL THEN 
+				"-" ELSE 
+				last_name
+			END) as last_name
+				 
 		',FALSE);
 		$this->db->from('incomes_client');
 		if(!empty($page)) {
@@ -143,6 +141,7 @@ class Clients_model extends CI_Model {
 			
 			if($this->db->trans_status() !== FALSE){
 				$this->db->trans_commit();
+				return true;
 			}else{
 				$this->db->trans_rollback();
 				return false;
