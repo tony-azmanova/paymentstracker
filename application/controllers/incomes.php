@@ -41,7 +41,7 @@ class Incomes extends MY_Controller {
 		$config = array();
 		$config["base_url"] = base_url('incomes/page/');
 		$config["total_rows"] = $income_result;
-		$config["per_page"] = 3;
+		$config["per_page"] = 5;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
 		$this->pagination->initialize($config);

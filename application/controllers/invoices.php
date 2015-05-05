@@ -37,7 +37,7 @@ class Invoices extends MY_Controller {
 		$config = array();
 		$config["base_url"] =base_url('invoices/page/');
 		$config["total_rows"] = $invoice_result;
-		$config["per_page"] = 11;
+		$config["per_page"] = 10;
 		$config["uri_segment"] = 3;
 		$config['use_page_numbers'] = TRUE;
 		$this->pagination->initialize($config);
