@@ -21,16 +21,34 @@
 		border: 2px #87CEFA; 
 		
 	}
+	
+	.container_statistics{
+		
+		height:40%;
+		padding-left:5%;
+		padding-right:65%;
+		border-top: 2px solid #708090;
+		background-color:#F5F5F5;
+		
+	}
+	.container_top{
+		
+		padding-left:25%;
+		
+	}
 
 	.col-sm-5{
+		
 		border-top: 2px solid #708090;
 		background-color:#337ab7;
+		
 	}
 	
 	.col-xs-5{
 		
 		border-top: 2px solid #708090;
 		background-color:#337ab7;
+		
 	}
 	
 	.col-sm-7{
@@ -38,15 +56,25 @@
 		
 	}
 	.col-md-2{
+		
 		border-top: 2px solid #708090;
 	
 	}
 	
 	.col-md-4{
+		
 		border-top: 2px solid #708090;
 	
 	}
+	
+	.col-md-5{
+		
+		border-top: 2px solid #708090;
+	
+	}
+	
 	.col-md-1{
+		
 		border-top: 2px solid #708090;
 		
 	}
