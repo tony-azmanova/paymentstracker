@@ -19,7 +19,7 @@ class Users extends MY_Controller {
         parent::__construct();
        
         $this->load->model('Statistics_model');
-        $this->output->enable_profiler(TRUE);
+		$this->output->enable_profiler(FALSE);
     }
     
     

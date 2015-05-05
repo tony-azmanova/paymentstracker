@@ -20,8 +20,7 @@ class Invoices extends MY_Controller {
         $this->load->model('Invoices_model');
         $this->load->model('Items_model');
         $this->load->model('Incomes_model');
-        $this->output->enable_profiler(TRUE);
-       
+        $this->output->enable_profiler(FALSE);
     }
     
     /**

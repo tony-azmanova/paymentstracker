@@ -24,7 +24,7 @@ class Clients extends MY_Controller {
 			echo "You have to wait the admin to change your status to 'activ'!";
 			die;
 		}	
-        $this->output->enable_profiler(TRUE);  
+        $this->output->enable_profiler(FALSE);  
 	}
     
    
