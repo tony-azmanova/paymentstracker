@@ -116,24 +116,21 @@ class Incomes_model extends CI_Model {
 		incomes.income_name,incomes.total_income,incomes_client.id as clients_id,
 		incomes_client.last_name,incomes_client.first_name,
 		incomes_client.email,incomes_client.phone,
-			(SELECT incomes_client.company_name
-				(CASE WHEN incomes_client.company_name is NULL THEN
-					"-" ELSE incomes_client.company_name
-				END) FROM incomes_client
-			)as company,
-			(SELECT incomes_client.first_name
-				(CASE WHEN first_name is NULL THEN 
-					"-" ELSE 
-					first_name
-				END) FROM incomes_client
-			) as client_first_name,
-			(SELECT incomes_client.last_name
-				(CASE WHEN last_name is NULL THEN 
-					"-" ELSE 
-					last_name
-				END) FROM incomes_client
-			) as client_last_name
 			
+			(CASE WHEN incomes_client.company_name is NULL THEN
+				"-" ELSE incomes_client.company_name
+			END) as company,
+		
+			(CASE WHEN first_name is NULL THEN 
+				"-" ELSE 
+				first_name
+			END) as client_first_name,
+		
+			(CASE WHEN last_name is NULL THEN 
+				"-" ELSE 
+				last_name
+			END) as client_last_name
+		
 			',FALSE);
 		$this->db->from('incomes');
 		$this->db->join('incomes_categories','incomes.income_category = incomes_categories.id','left');
