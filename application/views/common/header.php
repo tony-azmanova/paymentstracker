@@ -98,7 +98,7 @@
 			});
 		</script>	
 		
-		<h1>Payments</h1>
+		<h1>PaymentsTracker</h1>
 		<?php if(isset($succsesfully)) { ?>
 			<div style="background:#00FF00;">You have been successfily registered!</div>
 		<?php } ?>
